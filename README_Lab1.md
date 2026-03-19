@@ -2,8 +2,8 @@
 
 **Course:** Formal Languages & Finite Automata  
 **Variant:** 5  
-**Student:** Cretu Dumitru  
-**Group:** FAF-2XX
+**Student:** Cerneaga Daniil
+**Group:** FAF-243
 
 ---
 
