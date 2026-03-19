@@ -1,73 +1,100 @@
-from grammar import Grammar, FiniteAutomaton
+from lexer import Lexer, TokenType
 
 
-def main():
-    # ------------------------------------------------------------------ #
-    #  Variant 5 grammar definition                                        #
-    #  VN = {S, F, L},  VT = {a, b, c, d}                                #
-    #  P:                                                                  #
-    #    S -> bS | aF | d                                                  #
-    #    F -> cF | dF | aL | b                                             #
-    #    L -> aL | c                                                       #
-    # ------------------------------------------------------------------ #
-    V_n = {"S", "F", "L"}
-    V_t = {"a", "b", "c", "d"}
-    P = {
-        "S": ["bS", "aF", "d"],
-        "F": ["cF", "dF", "aL", "b"],
-        "L": ["aL", "c"],
+def run(title: str, source: str, skip_newlines: bool = True):
+    """Tokenize source and print the token stream."""
+    print(f"\n{'=' * 60}")
+    print(f"  {title}")
+    print(f"{'=' * 60}")
+    print("Source:")
+    print(source)
+    print("\nTokens:")
+
+    lexer  = Lexer(source)
+    tokens = lexer.tokenize()
+
+    for tok in tokens:
+        if skip_newlines and tok.type == TokenType.NEWLINE:
+            continue
+        print(f"  {tok}")
+
+
+# ------------------------------------------------------------------ #
+#  Sample 1 — Variable declarations and arithmetic                    #
+# ------------------------------------------------------------------ #
+run("Sample 1 — Variable declarations and arithmetic", """\
+let x = 42
+let y = 3.14
+let result = x * y + 100 ** 2
+""")
+
+
+# ------------------------------------------------------------------ #
+#  Sample 2 — Function definition and call                            #
+# ------------------------------------------------------------------ #
+run("Sample 2 — Function definition and call", """\
+fn add(a, b) {
+    return a + b
+}
+
+let sum = add(10, 20)
+print(sum)
+""")
+
+
+# ------------------------------------------------------------------ #
+#  Sample 3 — Conditional with comparison operators                   #
+# ------------------------------------------------------------------ #
+run("Sample 3 — Conditional with comparison operators", """\
+let age = 18
+if age >= 18 and age <= 65 {
+    print("working age")
+} elif age < 18 {
+    print("minor")
+} else {
+    print("retired")
+}
+""")
+
+
+# ------------------------------------------------------------------ #
+#  Sample 4 — While loop and modulo                                   #
+# ------------------------------------------------------------------ #
+run("Sample 4 — While loop and modulo", """\
+let i = 0
+while i < 10 {
+    if i % 2 == 0 {
+        print(i)
     }
-    S = "S"
-
-    grammar = Grammar(V_n, V_t, P, S)
-    print("=== Grammar (Variant 5) ===")
-    print(grammar)
-
-    # ------------------------------------------------------------------ #
-    #  Task b: Generate 5 valid strings                                    #
-    # ------------------------------------------------------------------ #
-    print("\n=== 5 Generated Strings ===")
-    generated = []
-    for i in range(5):
-        s = grammar.generate_string()
-        generated.append(s)
-        print(f"  {i + 1}. '{s}'")
-
-    # ------------------------------------------------------------------ #
-    #  Task c: Convert Grammar -> Finite Automaton                         #
-    # ------------------------------------------------------------------ #
-    fa = grammar.to_finite_automaton()
-    print("\n=== Converted Finite Automaton ===")
-    print(fa)
-
-    # ------------------------------------------------------------------ #
-    #  Task d: Check membership of strings                                 #
-    # ------------------------------------------------------------------ #
-    print("\n=== Membership Checks ===")
-
-    # All generated strings must be accepted
-    print("  Generated strings (should all be ACCEPTED):")
-    for s in generated:
-        result = fa.string_belongs_to_language(s)
-        mark = "✓" if result else "✗"
-        print(f"    {mark}  '{s}' -> {result}")
-
-    # Some hand-crafted valid strings
-    valid_examples = ["d", "ab", "bbd", "acb", "aac", "bbab", "aadab"]
-    print("\n  Hand-crafted valid strings (should be ACCEPTED):")
-    for s in valid_examples:
-        result = fa.string_belongs_to_language(s)
-        mark = "✓" if result else "✗"
-        print(f"    {mark}  '{s}' -> {result}")
-
-    # Some invalid strings
-    invalid_examples = ["", "a", "ba", "abc", "aa", "bc", "ca"]
-    print("\n  Invalid strings (should be REJECTED):")
-    for s in invalid_examples:
-        result = fa.string_belongs_to_language(s)
-        mark = "✓" if not result else "✗"
-        print(f"    {mark}  '{s}' -> {result}")
+    i = i + 1
+}
+""")
 
 
-if __name__ == "__main__":
-    main()
+# ------------------------------------------------------------------ #
+#  Sample 5 — Strings, booleans, comments, escape sequences          #
+# ------------------------------------------------------------------ #
+run("Sample 5 — Strings, booleans, comments", """\
+# This is a comment
+let name = "Daniil"
+let greeting = "Hello, " + name
+let active = true
+let score = 9.5
+print(greeting)
+""")
+
+
+# ------------------------------------------------------------------ #
+#  Sample 6 — For loop, arrow (return type hint), unknown chars       #
+# ------------------------------------------------------------------ #
+run("Sample 6 — For loop, type hints, unknown chars", """\
+fn greet(name: str) -> str {
+    return "Hi, " + name
+}
+
+for item in [1, 2, 3] {
+    print(item)
+}
+
+let bad = @unknown$
+""")
